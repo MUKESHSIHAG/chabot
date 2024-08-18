@@ -39,8 +39,12 @@ groq_model=llama3-8b-8192
 
 - To generate the GROQ_API_KEY, refer to the [Groq Documentation](https://console.groq.com/docs/quickstart).
 
+4. **Run Pytest**
+```
+python -m pytest app/tests/test_chat.py
+```
 
-4. **Start the Backend**:
+5. **Start the Backend**:
 ```uvicorn main:app --reload```
 
 ## Setup and Run the Frontend
