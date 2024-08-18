@@ -1,21 +1,23 @@
-from sqlalchemy import Column, Integer, String, Boolean, Text, DateTime, ForeignKey
+from sqlalchemy import Column, String, Boolean, Text, DateTime, ForeignKey
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 import datetime
+import uuid
 
 Base = declarative_base()
 
 class Session(Base):
     __tablename__ = 'sessions'
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     user_id = Column(String, index=True)
     start_time = Column(DateTime, default=datetime.datetime.utcnow)
     end_time = Column(DateTime)
 
 class Message(Base):
     __tablename__ = 'messages'
-    id = Column(Integer, primary_key=True, index=True)
-    session_id = Column(Integer, ForeignKey('sessions.id'), nullable=False)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    session_id = Column(UUID(as_uuid=True), ForeignKey('sessions.id'), nullable=False)
     message = Column(Text, nullable=False)
     response = Column(Text)
     timestamp = Column(DateTime, default=datetime.datetime.utcnow)

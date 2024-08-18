@@ -1,8 +1,10 @@
 from sqlalchemy.orm import Session
+from uuid import UUID
 from . import models, schemas
+from sqlalchemy import func
 
-def get_session(db: Session, session_id: int):
-    return db.query(models.Session).filter(models.Session.id == session_id).first()
+def get_session(db: Session, session_id: UUID):
+    return db.query(models.Session).filter(models.Session.id == (session_id)).first()
 
 def create_session(db: Session, session: schemas.SessionCreate):
     db_session = models.Session(**session.dict())
@@ -18,7 +20,7 @@ def create_message(db: Session, message: schemas.MessageCreate):
     db.refresh(db_message)
     return db_message
 
-def edit_message(db: Session, message_id: int, new_message: str):
+def edit_message(db: Session, message_id: UUID, new_message: str):
     db_message = db.query(models.Message).filter(models.Message.id == message_id).first()
     if db_message:
         db_message.is_edited = True
@@ -28,7 +30,7 @@ def edit_message(db: Session, message_id: int, new_message: str):
         db.refresh(db_message)
     return db_message
 
-def delete_message(db: Session, message_id: int):
+def delete_message(db: Session, message_id: UUID):
     db_message = db.query(models.Message).filter(models.Message.id == message_id).first()
     if db_message:
         db_message.is_deleted = True

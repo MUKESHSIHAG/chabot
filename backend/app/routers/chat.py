@@ -4,6 +4,7 @@ from .. import schemas, crud, database
 import os
 from groq import Groq
 from dotenv import load_dotenv
+from uuid import UUID
 
 load_dotenv()
 
@@ -24,7 +25,8 @@ def get_db():
         db.close()
 
 @router.post("/chat/", response_model=schemas.MessageResponse)
-async def chat(message: schemas.MessageCreate, db: Session = Depends(get_db)):    
+async def chat(message: schemas.MessageCreate, db: Session = Depends(get_db)):   
+    print("here is the id....", message, message.session_id)
     session = crud.get_session(db, message.session_id)
     if session is None:
         # Create a new session if it doesn't exist
@@ -47,8 +49,9 @@ async def chat(message: schemas.MessageCreate, db: Session = Depends(get_db)):
             model=groq_model,
         )
         response = groq_res.choices[0].message.content
-
+    print("res...", response)
     message_data = schemas.MessageCreate(session_id=message.session_id, message=message.message)
+    print("msg_data...", message_data)
     db_message = crud.create_message(db, message=message_data)
     db_message.response = response
     db.commit()
@@ -58,14 +61,14 @@ async def chat(message: schemas.MessageCreate, db: Session = Depends(get_db)):
 
 
 @router.put("/edit/{message_id}/", response_model=schemas.MessageResponse)
-async def edit_message(message_id: int, edit: schemas.MessageEdit, db: Session = Depends(get_db)):
+async def edit_message(message_id: UUID, edit: schemas.MessageEdit, db: Session = Depends(get_db)):
     db_message = crud.edit_message(db, message_id, edit.new_message)
     if db_message is None:
         raise HTTPException(status_code=404, detail="Message not found")
     return db_message
 
 @router.delete("/delete/{message_id}/", response_model=schemas.MessageResponse)
-async def delete_message(message_id: int, db: Session = Depends(get_db)):
+async def delete_message(message_id: UUID, db: Session = Depends(get_db)):
     db_message = crud.delete_message(db, message_id)
     if db_message is None:
         raise HTTPException(status_code=404, detail="Message not found")

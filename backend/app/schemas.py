@@ -1,15 +1,16 @@
 from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime
+from uuid import UUID
 
 class MessageBase(BaseModel):
     message: str
 
 class MessageCreate(MessageBase):
-    session_id: int
+    session_id: UUID
 
 class MessageResponse(BaseModel):
-    id: int
+    id: UUID
     message: str
     response: str
     timestamp: datetime
@@ -24,7 +25,7 @@ class SessionCreate(BaseModel):
     user_id: Optional[str]
 
 class SessionResponse(BaseModel):
-    id: int
+    id: UUID
     start_time: datetime
     end_time: Optional[datetime]
     messages: List[MessageResponse] = []
