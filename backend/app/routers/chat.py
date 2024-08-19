@@ -26,7 +26,6 @@ def get_db():
 
 @router.post("/chat/", response_model=schemas.MessageResponse)
 async def chat(message: schemas.MessageCreate, db: Session = Depends(get_db)):   
-    print("here is the id....", message, message.session_id)
     session = crud.get_session(db, message.session_id)
     if session is None:
         # Create a new session if it doesn't exist
@@ -49,9 +48,7 @@ async def chat(message: schemas.MessageCreate, db: Session = Depends(get_db)):
             model=groq_model,
         )
         response = groq_res.choices[0].message.content
-    print("res...", response)
     message_data = schemas.MessageCreate(session_id=message.session_id, message=message.message)
-    print("msg_data...", message_data)
     db_message = crud.create_message(db, message=message_data)
     db_message.response = response
     db.commit()
